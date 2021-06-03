@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <GL/glut.h>
-#define maxHt 800
-#define maxWd 600
+#define maxHt 1200
+#define maxWd 1200
 #define maxVer 10000
   
 FILE *fp;
@@ -377,9 +377,9 @@ void drawDino(void)
     initEdgeTable();
     drawPolyDino();
     printf("\nTable");
-    printTable();
+    //printTable();
       
-    ScanlineFill();//actual calling of scanline filling..
+    //ScanlineFill();//actual calling of scanline filling..
 }
   
 void main(int argc, char** argv)
