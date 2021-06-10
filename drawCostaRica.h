@@ -10,10 +10,15 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#include<math.h>  
 
-#define H_SIZE 1050
-#define V_SIZE 1050
+#define H_SIZE 2000
+#define V_SIZE 2000
 #define PROV_MAX_COORDS 600
+#define SIN(x) sin(x * 3.141592653589 / 180)
+#define COS(x) cos(x * 3.141592653589 / 180)
+#define X_Origen ((V_SIZE/2)-1)
+#define Y_Origen ((H_SIZE/2)-1)
 
 typedef struct {
   double r;
@@ -26,19 +31,19 @@ typedef struct {
   int y1;
   int x2;
   int y2;
-  int max_y;
-  int min_y;
+  int max_y; //maximo y de las dos coordenadas
+  int min_y; //minimo y de las dos coordenadas
 } BORDES;
 
 typedef struct {
   BORDES *bordes_array; //coordenadas que seran ingresadas en orden de Ymax hacia Ymin a partir de las coordenadas de BORDES
   int esta_pintado;
   int cant;
-  int yMAX;
-  int yMIN; 
+  int yMAX; //maximo local
+  int yMIN; //minimo local
 } BORDES_PINTADOS;
 
-typedef struct ACTIVO
+typedef struct ACTIVO //estructura de datos que representa a los bordes que se encuentran activos, y a los cuales se les calcula las intersecciones
 {
   int x1; //coordenadas
   int y1;
@@ -50,6 +55,24 @@ typedef struct ACTIVO
 	struct ACTIVO *anterior;
 
 }ACTIVO;
+
+typedef struct INTERSECCION //las intersecciones estan compuestas, en este caso, unicamente de 2 bordes
+{
+  int ix; //coordenada x de la interseccion
+  int iy; //coordenada x de la interseccion
+  int bminy; //minimo valor de y del borde 1
+  int bmaxy; //maximo valor de y del borde 1
+  //int encima_y_debajo;
+  //int solo_un_l`do;
+}INTERSECCION;
+
+typedef struct PARES
+{
+  struct INTERSECCION primera;
+  struct INTERSECCION segunda;
+}PARES;
+
+
 void pintar_provincia(int indice, int r, int g, int b);
 void plot(int x, int y, int r, int g, int b);
 void clasificar_provincias();
@@ -63,8 +86,7 @@ int minimo_activo();
 void plot_line (int x0, int y0, int x1, int y1, int r, int g, int b);
 void pintar_bordes_mapa();
 void pintar_puntos_mapa();
-void dibujar_escena();
 void crear_buffer();
 void dibujar_escena();
 void actualizar_buffer();
-
+void rotar_mapa(double angulo);

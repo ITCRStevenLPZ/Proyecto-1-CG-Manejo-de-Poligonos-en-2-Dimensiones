@@ -379,7 +379,7 @@ void drawDino(void)
     printf("\nTable");
     //printTable();
       
-    //ScanlineFill();//actual calling of scanline filling..
+    ScanlineFill();//actual calling of scanline filling..
 }
   
 void main(int argc, char** argv)

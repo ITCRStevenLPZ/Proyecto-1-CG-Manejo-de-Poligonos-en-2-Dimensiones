@@ -132,16 +132,16 @@ class Create_random_polygon:
         return self.array
 
 if __name__ == "__main__":
-	provincias = [("ALA",30),("SJO",20),("HER",20),("CAR",30),("GUA",30),("LIM",30),("PUN",10),("PUN2",20)]
+	provincias = [("ALA",17),("SJO",20),("HER",25),("CAR",25),("GUA",15),("LIM",15),("PUN",15),("PUN2",17)]
 	f = open("coordenadas.txt", "w")
 	for prov in provincias:
 		array = []
-		provi = prov[0]+".jpg"
+		provi = prov[0]+"2.0.jpg"
 		im = Image.open(r""+provi)
 		rgb_im = im.convert('RGB')
 		coordenadas = []
-		height = 1000
-		width = 1000
+		height = 2000
+		width = 2000
 		#iteraciones = 1500
 		for i in range(0,width):
 			for j in range(0,height):	
