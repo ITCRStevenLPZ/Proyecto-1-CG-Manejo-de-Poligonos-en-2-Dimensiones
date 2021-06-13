@@ -56,7 +56,7 @@ int main(int argc, char** argv){
 }
 
 void dibujar_escena(){
-   rotar_mapa(180);
+   rotar_mapa(0);
    pintar_provincia(4,255,255,0);
    pintar_provincia(5,255,0,0);
    pintar_provincia(6,255,0,255);
@@ -95,17 +95,17 @@ void rotar_mapa(double angle){
       int y_min = 1500;
       int y_max = 0;
       while(provincias[i][iter].x1 != 0 && provincias[i][iter].y1 != 0 && provincias[i][iter].x2 != 0 && provincias[i][iter].y2 != 0){
-         printf("\n PINTA Coord x1 = %d, Coord y1 = %d & Coord x2 = %d, Coord y2 = %d",provincias[i][iter].x1, provincias[i][iter].y1, provincias[i][iter].x2, provincias[i][iter].y2);
+         //printf("\n PINTA Coord x1 = %d, Coord y1 = %d & Coord x2 = %d, Coord y2 = %d",provincias[i][iter].x1, provincias[i][iter].y1, provincias[i][iter].x2, provincias[i][iter].y2);
          int x1_shifted = provincias[i][iter].x1 - X_Origen;
          int y1_shifted = provincias[i][iter].y1 - Y_Origen;
          int x2_shifted = provincias[i][iter].x2 - X_Origen;
          int y2_shifted = provincias[i][iter].y2 - Y_Origen;
-         printf("\n SHIFTED Coord x1 = %d, Coord y1 = %d & Coord x2 = %d, Coord y2 = %d",x1_shifted,y1_shifted,x2_shifted,y2_shifted);
+         //printf("\n SHIFTED Coord x1 = %d, Coord y1 = %d & Coord x2 = %d, Coord y2 = %d",x1_shifted,y1_shifted,x2_shifted,y2_shifted);
          int x1 = (int)X_Origen + (x1_shifted * COS(angulo) - y1_shifted * SIN(angulo));
          int y1 = (int)Y_Origen + (x1_shifted * SIN(angulo) + y1_shifted * COS(angulo));
          int x2 = (int)X_Origen + (x2_shifted * COS(angulo) - y2_shifted * SIN(angulo));
          int y2 = (int)Y_Origen + (x2_shifted * SIN(angulo) + y2_shifted * COS(angulo));
-         printf("\n TRANSFORMA Coord x1 = %d, Coord y1 = %d & Coord x2 = %d, Coord y2 = %d",x1,y1,x2,y2);
+         //printf("\n TRANSFORMA Coord x1 = %d, Coord y1 = %d & Coord x2 = %d, Coord y2 = %d",x1,y1,x2,y2);
          provincias[i][iter].x1 = x1;
          provincias[i][iter].y1 = y1;
          provincias[i][iter].x2 = x2;
@@ -257,7 +257,7 @@ void activarBordes(int tamano,BORDES *bordes_array, int max_y){
       //printf("\nBuscando = %d", i);
       //printf("\nComparando el max del borde = %d con el scanline =  %d", provincia_iterada->bordes_array[i].max_y,max_y);
         if(bordes_array[i].max_y == max_y){ //SOLO SI EL MAXIMO LOCAL DE CADA BORDE ES IGUAL AL SCANLINE SE ACTIVA
-          //printf("\nEncontre un activo con ymax = %d y  con ymin = %d", max_y,bordes_array[i].min_y);
+          printf("\nEncontre un activo con ymax = %d y  con ymin = %d", max_y,bordes_array[i].min_y);
           double x1 = (double)bordes_array[i].x1;
           double y1 = (double)bordes_array[i].y1;
           double x2 = (double)bordes_array[i].x2;
@@ -294,7 +294,7 @@ void scanline(int index, int r, int g, int b){
       while(minimo_posible <= scanline){
         activarBordes(tamano,provincia_iterada->bordes_array,scanline);
         minimo_posible = minimo_activo();
-        //printf("\nBORDES ACTIVOS = %d", bordes_activos);
+        printf("\nBORDES ACTIVOS = %d", bordes_activos);
         ACTIVO *temp = primero;
         INTERSECCION* intersec = (INTERSECCION *)malloc(100 * sizeof(INTERSECCION)); //se crea un lista de objetos interseccion
         int iter_intersecciones = 0;
@@ -330,7 +330,7 @@ void scanline(int index, int r, int g, int b){
          }
          //printf("\n NUEVO SCANLINE \n\n\n");
          for(i = 0;i < iter_intersecciones; i++){
-            //printf("\n INTERSECCION ORDENADA. COORD X = %d , COORD Y = %d, MINIMO LOCAL  = %d, MAXIMO LOCAL  = %d", intersec[i].ix, intersec[i].iy, intersec[i].bminy, intersec[i].bmaxy);
+            printf("\n INTERSECCION ORDENADA. COORD X = %d , COORD Y = %d, MINIMO LOCAL  = %d, MAXIMO LOCAL  = %d", intersec[i].ix, intersec[i].iy, intersec[i].bminy, intersec[i].bmaxy);
          }
          //printf("\n I.Originales = %d", iter_intersecciones);
          INTERSECCION* inter_depurada = (INTERSECCION *)malloc(iter_intersecciones * sizeof(INTERSECCION)); //se crea un lista de objetos interseccion
@@ -338,10 +338,15 @@ void scanline(int index, int r, int g, int b){
          int index = 0;
          while(index < iter_intersecciones){
             if(index+1 < iter_intersecciones){
-               if(intersec[index].ix == intersec[index+1].ix){
-                  inter_depurada[index_depurada]=intersec[index];
-                  index++;
-                  index_depurada++;
+               if(intersec[index].iy == intersec[index+1].iy){
+                    if(intersec[index].bminy == intersec[index+1].bmaxy || intersec[index].bmaxy == intersec[index+1].bminy){
+                        inter_depurada[index_depurada]=intersec[index];
+                        index++;
+                        index_depurada++;
+                    }else{
+                        inter_depurada[index_depurada]=intersec[index];
+                        index_depurada++;
+                    }
                }else{
                   inter_depurada[index_depurada]=intersec[index];
                   index_depurada++;
@@ -353,49 +358,44 @@ void scanline(int index, int r, int g, int b){
             index++;
          }
          for(i = 0;i < index_depurada; i++){
-            //printf("\n INTERSECCION DEPURADA. COORD X = %d , COORD Y = %d, MINIMO LOCAL  = %d, MAXIMO LOCAL  = %d", inter_depurada[i].ix, inter_depurada[i].iy, inter_depurada[i].bminy, inter_depurada[i].bmaxy);
+            printf("\n INTERSECCION DEPURADA. COORD X = %d , COORD Y = %d, MINIMO LOCAL  = %d, MAXIMO LOCAL  = %d", inter_depurada[i].ix, inter_depurada[i].iy, inter_depurada[i].bminy, inter_depurada[i].bmaxy);
          }
          //printf("\n I.Depuradas = %d", index_depurada);
-         PARES* pares = (PARES *)malloc(index_depurada * sizeof(PARES));
+         /*PARES* pares = (PARES *)malloc(index_depurada * sizeof(PARES));
          index = 0;
          int pares_index = 0;
          while(index < index_depurada && index_depurada != 1){
             if(index_depurada %2 == 0 && index+1 < index_depurada){
                pares[pares_index].primera = inter_depurada[index];
                pares[pares_index].segunda = inter_depurada[index+1];
-               //printf("\n Px = %d Py = %d---PMAXL = %d SMAXL = %d--- y Sx = %d Sy = %d---PMINL = %d SMINL = %d---",pares[pares_index].primera.ix,pares[pares_index].primera.iy,pares[pares_index].primera.bmaxy,pares[pares_index].segunda.bmaxy,pares[pares_index].segunda.ix,pares[pares_index].segunda.iy,pares[pares_index].primera.bminy,pares[pares_index].segunda.bminy);
+               printf("\n Px = %d Py = %d y Sx = %d Sy = %d---PMINL = %d SMINL = %d PMAXL = %d SMAXL = %d---",pares[pares_index].primera.ix,pares[pares_index].primera.iy,pares[pares_index].segunda.ix,pares[pares_index].segunda.iy,pares[pares_index].primera.bminy,pares[pares_index].segunda.bminy,pares[pares_index].primera.bmaxy,pares[pares_index].segunda.bmaxy);
                pares_index++;
                index++;
             }else if(index_depurada %2 != 0 && index+1 < index_depurada){
                pares[pares_index].primera = inter_depurada[index];
                pares[pares_index].segunda = inter_depurada[index+1];
-               //printf("\n Px = %d Py = %d---PMAXL = %d SMAXL = %d--- y Sx = %d Sy = %d---PMINL = %d SMINL = %d---",pares[pares_index].primera.ix,pares[pares_index].primera.iy,pares[pares_index].primera.bmaxy,pares[pares_index].segunda.bmaxy,pares[pares_index].segunda.ix,pares[pares_index].segunda.iy,pares[pares_index].primera.bminy,pares[pares_index].segunda.bminy);
+               printf("\n Px = %d Py = %d y Sx = %d Sy = %d---PMINL = %d SMINL = %d PMAXL = %d SMAXL = %d---",pares[pares_index].primera.ix,pares[pares_index].primera.iy,pares[pares_index].segunda.ix,pares[pares_index].segunda.iy,pares[pares_index].primera.bminy,pares[pares_index].segunda.bminy,pares[pares_index].primera.bmaxy,pares[pares_index].segunda.bmaxy);
                pares_index++;
             }
             index++;
-         }
-         index = 0;
-         int odd_parity = 0; //0 Pinta, 1 no Pinta
-         /*if(index_depurada %2 != 0 && index_depurada != 1){
-            while(index < pares_index){
-               if(odd_parity==0){
-                  plot_line(pares[index].primera.ix,pares[index].primera.iy,pares[index].segunda.ix, pares[index].segunda.iy,r,g,b);
-                  odd_parity = 1;
-               }else{
-                  odd_parity = 0;
-               }
-               index++;
-            }
-         }else{
-            while(index < pares_index){
-               plot_line(pares[index].primera.ix,pares[index].primera.iy,pares[index].segunda.ix, pares[index].segunda.iy,r,g,b);
-               index++;
-            }
          }*/
-         while(index < pares_index){
+
+         index = 0;
+         int odd_parity = 1; //1 Pinta, 0 no Pinta
+        while(index < index_depurada){
+            if(odd_parity==1 && index+1 < index_depurada){
+                plot_line(inter_depurada[index].ix,inter_depurada[index].iy,inter_depurada[index+1].ix, inter_depurada[index+1].iy,r,g,b);
+                odd_parity = 0;
+            }else{
+                odd_parity = 1;
+            }
+            index++;
+        }
+
+         /*while(index < pares_index){
             plot_line(pares[index].primera.ix,pares[index].primera.iy,pares[index].segunda.ix, pares[index].segunda.iy,r,g,b);
             index++;
-         }
+         }*/
         scanline--;
       }
       max_y = scanline+1;

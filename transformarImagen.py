@@ -132,7 +132,7 @@ class Create_random_polygon:
         return self.array
 
 if __name__ == "__main__":
-	provincias = [("ALA",17),("SJO",20),("HER",25),("CAR",25),("GUA",15),("LIM",15),("PUN",15),("PUN2",17)]
+	provincias = [("ALA",17),("SJO",20),("HER",25),("CAR",25),("GUA",15),("LIM",15),("PUN",5),("PUN2",17)]
 	f = open("coordenadas.txt", "w")
 	for prov in provincias:
 		array = []
