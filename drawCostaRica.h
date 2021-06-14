@@ -74,12 +74,6 @@ typedef struct INTERSECCION_PROV
 
 }INTERSECCION_PROV;
 
-typedef struct TEXTURA
-{
-  struct COLOR **mapa_colores;
-
-}TEXTURA;
-
 void dibujar_patron(int provincia);
 void plot_texture_line (int x0, int y0, int x1, int y1, int index); //Bresenham pero con RGB de las texturas
 void pintar_provincia(int indice, int r, int g, int b);
