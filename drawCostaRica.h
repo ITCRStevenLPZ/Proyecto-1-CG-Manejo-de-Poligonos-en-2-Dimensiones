@@ -12,6 +12,8 @@
 #include <GL/glut.h>
 #include<math.h>  
 
+#define TH 5
+#define TV 5
 #define H_SIZE 2000
 #define V_SIZE 2000
 #define PROV_MAX_COORDS 600
@@ -62,17 +64,24 @@ typedef struct INTERSECCION //las intersecciones estan compuestas, en este caso,
   int iy; //coordenada x de la interseccion
   int bminy; //minimo valor de y del borde 1
   int bmaxy; //maximo valor de y del borde 1
-  //int encima_y_debajo;
-  //int solo_un_l`do;
+  int cant;
 }INTERSECCION;
 
-typedef struct PARES
+typedef struct INTERSECCION_PROV
 {
-  struct INTERSECCION primera;
-  struct INTERSECCION segunda;
-}PARES;
+  struct INTERSECCION* intersecciones;
+  int cant;
 
+}INTERSECCION_PROV;
 
+typedef struct TEXTURA
+{
+  struct COLOR **mapa_colores;
+
+}TEXTURA;
+
+void dibujar_patron(int provincia);
+void plot_texture_line (int x0, int y0, int x1, int y1, int index); //Bresenham pero con RGB de las texturas
 void pintar_provincia(int indice, int r, int g, int b);
 void plot(int x, int y, int r, int g, int b);
 void clasificar_provincias();
@@ -90,3 +99,4 @@ void crear_buffer();
 void dibujar_escena();
 void actualizar_buffer();
 void rotar_mapa(double angulo);
+void calcular_intersecciones_scanline();
