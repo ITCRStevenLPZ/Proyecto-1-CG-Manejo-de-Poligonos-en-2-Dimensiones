@@ -43,7 +43,7 @@ int main(int argc, char** argv){
         return 1;
     }
 	crear_buffer();
-	clasificar_provincias();
+	clasificar_provincias(-500,0,2,2);
   	glutInit(&argc, argv);
   	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
   	glutInitWindowSize(H_SIZE,V_SIZE);
@@ -56,24 +56,24 @@ int main(int argc, char** argv){
 }
 
 void dibujar_escena(){
-   rotar_mapa(180);
-   /*scanline(4,255,255,0);
+   rotar_mapa(90);
+   scanline(4,255,255,0);
    scanline(5,255,0,0);
    scanline(6,255,0,255);
    scanline(0,0,0,255);
    scanline(1,0,255,0);
    scanline(2,0,255,255);
    scanline(3,0,0,0);
-   scanline(7,255,0,255);*/
-    dibujar_patron(5);
+   scanline(7,255,0,255);
+    /*dibujar_patron(5);
    dibujar_patron(4);
     dibujar_patron(6);
    dibujar_patron(0);
    dibujar_patron(1);
    dibujar_patron(2);
    dibujar_patron(3);
-   dibujar_patron(7);
-   pintar_bordes_mapa();
+   dibujar_patron(7);*/
+   //pintar_bordes_mapa();
   //actualizar_buffer();
   int i , j;
   for (i = 0; i < H_SIZE; i++){
@@ -100,11 +100,12 @@ void rotar_mapa(double angle){
    BORDES *provincias[8] = {ALA,SJO,_ER,CAR,GUA,LIM,PUN,PUN2};
    int i;
    for(int i = 0; i<8;i++){
+    //printf("\n\nNUEVA PROVINCIA");
       int iter = 0;
-      int y_min = 1500;
-      int y_max = 0;
+      int y_min = 3000;
+      int y_max = -3000;
       while(provincias[i][iter].x1 != 0 && provincias[i][iter].y1 != 0 && provincias[i][iter].x2 != 0 && provincias[i][iter].y2 != 0){
-         //printf("\n PINTA Coord x1 = %d, Coord y1 = %d & Coord x2 = %d, Coord y2 = %d",provincias[i][iter].x1, provincias[i][iter].y1, provincias[i][iter].x2, provincias[i][iter].y2);
+         //printf("\n ORIGINAL Coord x1 = %d, Coord y1 = %d & Coord x2 = %d, Coord y2 = %d",provincias[i][iter].x1, provincias[i][iter].y1, provincias[i][iter].x2, provincias[i][iter].y2);
          int x1_shifted = provincias[i][iter].x1 - X_Origen;
          int y1_shifted = provincias[i][iter].y1 - Y_Origen;
          int x2_shifted = provincias[i][iter].x2 - X_Origen;
@@ -144,6 +145,10 @@ void rotar_mapa(double angle){
       BORDES_PINTADOS* nuevo_pintado = provincias_pintadas[i];
       BORDES* provincia_iterada = provincias[i];
       nuevo_pintado = ordenar_Y(provincia_iterada,nuevo_pintado);
+      int j;
+        /*for(j = 0;j < nuevo_pintado->cant;j++){
+            printf("\n  ORDENADA: Coord x1 = %d, Coord y1 = %d, Coord x2 = %d, Coord y2 = %d, MAX Y = %d",nuevo_pintado->bordes_array[j].x1,nuevo_pintado->bordes_array[j].y1,nuevo_pintado->bordes_array[j].x2,nuevo_pintado->bordes_array[j].y2, nuevo_pintado->bordes_array[j].max_y);
+        }*/
       nuevo_pintado->yMAX = y_max;
       nuevo_pintado->yMIN = y_min;
       provincias_pintadas[i] = nuevo_pintado;
@@ -239,17 +244,11 @@ void eliminar_activo(int limite){
     }
 
 }
-void pintar_provincia(int indice, int r, int g, int b){
-  primero = NULL;
-  ultimo = NULL;
-  bordes_activos = 0;
-  scanline(indice,r,g,b);
-}
 
 int minimo_activo(){
    struct ACTIVO *temp;
    temp = primero;
-   int resp = 0;
+   int resp = -3000;
     while(temp != NULL)
     {
       if(temp->min_y > resp){
@@ -290,7 +289,7 @@ void dibujar_patron(int provincia){
     INTERSECCION_PROV *intersecciones_provincias[8] = {ALA_I,SJO_I,_ER_I,CAR_I,GUA_I,LIM_I,PUN_I,PUN2_I};
     int max_y = provincias[provincia]->yMAX;
     int min_y = provincias[provincia]->yMIN;
-    int tamano = max_y - min_y;
+    int tamano = abs(max_y - min_y);
     int indice = 0;
     INTERSECCION_PROV *iterada = intersecciones_provincias[provincia];
     while(indice < tamano){
@@ -393,10 +392,10 @@ void calcular_intersecciones_scanline(){
       int max_y = provincia_iterada->yMAX;
       int min_y = provincia_iterada->yMIN;
       int tamano = provincia_iterada->cant;
-      int tamano_total = max_y - min_y;
+      int tamano_total = max_y - min_y + 1;
       INTERSECCION_PROV *nuevas_intersecciones = (INTERSECCION_PROV *)malloc(tamano_total * sizeof(INTERSECCION_PROV));
       int tamano_iterado = 0;
-      //printf("\nMAX Y = %d,MIN Y = %d, TAMANO = %d", max_y,min_y,tamano);
+      //printf("\nMAX Y = %d,MIN Y = %d, TAMANO = %d", max_y,min_y,tamano_total);
       while(max_y >= min_y){//ESTE ES EL CICLO PRINCIPAL DEL METODO
         //printf("\nMAX Y = %d", max_y);
         int minimo_posible = 0;
@@ -404,10 +403,12 @@ void calcular_intersecciones_scanline(){
         //printf("\nBORDES ACTIVOS = %d", bordes_activos);
         if(bordes_activos >= 2){ //SOLO SI HAY BORDES ACTIVADOS, SE REALIZA LO SIGUIENTE
           minimo_posible = minimo_activo(); //BUSCA DE ENTRE LOS BORDES ACTIVOS AL MINIMO POSIBLE
+          //printf("\nMinimo Posible = %d",minimo_posible);
           int scanline = max_y;
           while(minimo_posible <= scanline){
             activarBordes(tamano,provincia_iterada->bordes_array,scanline);
             minimo_posible = minimo_activo();
+            //printf("\nMinimo Posible = %d",minimo_posible);
             //printf("\nBORDES ACTIVOS = %d", bordes_activos);
             ACTIVO *temp = primero;
             INTERSECCION* intersec = (INTERSECCION *)malloc(100 * sizeof(INTERSECCION)); //se crea un lista de objetos interseccion
@@ -442,7 +443,7 @@ void calcular_intersecciones_scanline(){
                 }
                 intersec[j+1] = temporal;
              }
-             //printf("\n NUEVO SCANLINE \n\n\n");
+             //printf("\n\n NUEVO SCANLINE");
              /*for(i = 0;i < iter_intersecciones; i++){
                 printf("\n INTERSECCION ORDENADA. COORD X = %d , COORD Y = %d, MINIMO LOCAL  = %d, MAXIMO LOCAL  = %d", intersec[i].ix, intersec[i].iy, intersec[i].bminy, intersec[i].bmaxy);
              }*/
@@ -472,7 +473,7 @@ void calcular_intersecciones_scanline(){
                 index++;
              }
              /*for(i = 0;i < index_depurada; i++){
-                //printf("\n INTERSECCION DEPURADA. COORD X = %d , COORD Y = %d, MINIMO LOCAL  = %d, MAXIMO LOCAL  = %d", inter_depurada[i].ix, inter_depurada[i].iy, inter_depurada[i].bminy, inter_depurada[i].bmaxy);
+                printf("\n INTERSECCION DEPURADA. COORD X = %d , COORD Y = %d, MINIMO LOCAL  = %d, MAXIMO LOCAL  = %d", inter_depurada[i].ix, inter_depurada[i].iy, inter_depurada[i].bminy, inter_depurada[i].bmaxy);
              }*/
              //printf("\nTAMANO ITERADO = %d", tamano_iterado);
              nuevas_intersecciones[tamano_iterado].intersecciones = inter_depurada;
@@ -492,12 +493,13 @@ void calcular_intersecciones_scanline(){
         max_y--;
       }
       intersecciones_provincias[indice] = nuevas_intersecciones;
+      //printf("\n-----------------------SE INSERTO UNA INTERSECCION----------------------------");
       //printf("\nSe inserto nuevas intersecciones, ultimo indice fue = %d", intersecciones_provincias[indice][tamano_total-1][0].ix);        
     }
     ALA_I = intersecciones_provincias[0];SJO_I = intersecciones_provincias[1];_ER_I = intersecciones_provincias[2];CAR_I = intersecciones_provincias[3];GUA_I = intersecciones_provincias[4];LIM_I = intersecciones_provincias[5];PUN_I = intersecciones_provincias[6];PUN2_I= intersecciones_provincias[7];
 }
 
-void clasificar_provincias(){
+void clasificar_provincias(int panx,int pany, float escalx, float escaly){
 	rewind(COORD);
    BORDES* nuevo_aux;
 	BORDES* nuevo;
@@ -507,17 +509,19 @@ void clasificar_provincias(){
 	int iter = 0;
   int tamano_real = 0;
 	int i = 0;
-  int y_max = 0;
-  int y_min = 1500;
+  int y_max = -3000;
+  int y_min = 3000;
   int x,y,x2,y2;
   fscanf(COORD, "%d,%d", &x, &y);
+  x = (int)(x+panx)*escalx; y = (int)(y + pany)*escaly;
   nuevo = crear_provinvias();
   nuevo_aux = crear_provinvias();
   nuevo_pintado = crear_provinvias_pintadas();
   while(!feof(COORD) && iter < 8){
-    if(x != 0 && y != 0){
+    if((int)((x / escalx) - panx)!= 0 && (int)((y / escaly) - pany) != 0){
       fscanf(COORD, "%d,%d", &x2, &y2);
-      if(x2 != 0 && y2 != 0){
+      x2 = (int)(x2+panx)*escalx; y2 = (int)(y2 + pany)*escaly;
+      if((int)((x2 / escalx) - panx) != 0 && (int)((y2 / escaly) - pany) != 0){
         nuevo[i].x1 = x;nuevo[i].y1 = y;nuevo[i].x2 = x2;nuevo[i].y2 = y2;
         nuevo_aux[i].x1 = x;nuevo_aux[i].y1 = y;nuevo_aux[i].x2 = x2;nuevo_aux[i].y2 = y2;
         //plot_line(x,y,x2,y2,0,0,0);
@@ -545,13 +549,15 @@ void clasificar_provincias(){
         x = x2;y = y2;
         tamano_real++;
         i++;
-      }else if(x2 == 0 && y2 == 0){
+      }else if((int)((x2 / escalx)- panx) == 0 && (int)((y2 / escaly) - pany) == 0){
         fscanf(COORD, "%d,%d", &x, &y);
+        x = (int)(x+panx)*escalx; y = (int)(y + pany)*escaly;
         i = 0;
         provincias[iter] = nuevo;
         nuevo_pintado->cant = tamano_real;nuevo_pintado->yMAX = y_max;nuevo_pintado->yMIN = y_min;
-        y_max = 0;
-        y_min = 1500;
+        //printf("\nTamano = %d, yMAX = %d, yMIN = %d", nuevo_pintado->cant,nuevo_pintado->yMAX,nuevo_pintado->yMIN);
+        y_max = -3000;
+        y_min = 3000;
         tamano_real = 0;
         nuevo_pintado = ordenar_Y(nuevo_aux,nuevo_pintado);
         provincias_pintadas[iter] = nuevo_pintado;
@@ -586,9 +592,9 @@ BORDES_PINTADOS* ordenar_Y(BORDES *bordes, BORDES_PINTADOS *bP){
       }
       b[j+1] = temp;
    }
-   for(j = 0;j < tamano;j++){
-    //printf("\n  ORDENADA: Coord x1 = %d, Coord y1 = %d, Coord x2 = %d, Coord y2 = %d, MAX Y = %d",b[j].x1,b[j].y1,b[j].x2,b[j].y2, b[j].max_y);
-   }
+   /*for(j = 0;j < tamano;j++){
+    printf("\n  ORDENADA: Coord x1 = %d, Coord y1 = %d, Coord x2 = %d, Coord y2 = %d, MAX Y = %d",b[j].x1,b[j].y1,b[j].x2,b[j].y2, b[j].max_y);
+   }*/
   bP->bordes_array = b;
   return bP;
 
@@ -649,9 +655,11 @@ void crear_buffer(){
 void plot(int x, int y, int r, int g, int b){
 
 	//printf("Resultado = %d , %d\n", x, y);
-    buffer[x][y].r = r;
-    buffer[x][y].g = g;
-    buffer[x][y].b = b;
+    if(x >= 0 && x < V_SIZE && y >= 0 && y < H_SIZE){
+        buffer[x][y].r = r;
+        buffer[x][y].g = g;
+        buffer[x][y].b = b;
+    }
 }
 
 void plot_line (int x0, int y0, int x1, int y1, int r, int g, int b) //Bresenham

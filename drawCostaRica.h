@@ -76,9 +76,8 @@ typedef struct INTERSECCION_PROV
 
 void dibujar_patron(int provincia);
 void plot_texture_line (int x0, int y0, int x1, int y1, int index); //Bresenham pero con RGB de las texturas
-void pintar_provincia(int indice, int r, int g, int b);
 void plot(int x, int y, int r, int g, int b);
-void clasificar_provincias();
+void clasificar_provincias(int panx,int pany, float escalx, float escaly);
 BORDES_PINTADOS* ordenar_Y(BORDES *b, BORDES_PINTADOS *bP);
 BORDES_PINTADOS* crear_provinvias_pintadas();
 BORDES * crear_provinvias();
