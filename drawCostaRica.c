@@ -33,17 +33,18 @@ int bordes_activos = 0;
 
 FILE *COORD;
 
-
+int panx_g;
+int pany_g;
+float escalx_g;
+float escaly_g;
+int angulo_g;
+int esPintado;
+int esTextura;
+int esBorde;
 
 int main(int argc, char** argv){
-	COORD=fopen ("coordenadas.txt","r");
-    if ( COORD == NULL )
-    {
-        printf("No se puede abrir archivo") ;
-        return 1;
-    }
-	crear_buffer();
-	clasificar_provincias(-500,0,2,2);
+    parametros_default();
+    //printf("\nAqui toy");
   	glutInit(&argc, argv);
   	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
   	glutInitWindowSize(H_SIZE,V_SIZE);
@@ -51,30 +52,75 @@ int main(int argc, char** argv){
   	glClear(GL_COLOR_BUFFER_BIT);
   	gluOrtho2D(-0.5, H_SIZE +0.5, -0.5, V_SIZE + 0.5);
   	glutDisplayFunc(dibujar_escena);
+    glutKeyboardFunc(teclado);
   	glutMainLoop();
-  	fclose(COORD);
+  	return 1;
+}
+void parametros_default(){
+    panx_g = 0;
+    pany_g = 0;
+    escalx_g = 1;
+    escaly_g = 1;
+    angulo_g = 180;
+    esPintado = 0;
+    esTextura = 0;
+    esBorde = 1;
+}
+
+void liberar_memoria(){
+    //liberar_pintada(ALA_P);liberar_pintada(SJO_P);liberar_pintada(_ER_P);liberar_pintada(CAR_P);liberar_pintada(GUA_P);liberar_pintada(LIM_P);liberar_pintada(PUN_P);liberar_pintada(PUN2_P);
+    free(ALA);free(SJO);free(_ER);free(CAR);free(GUA);free(LIM);free(PUN);free(PUN2);
+    liberar_intersecciones(ALA_I);liberar_intersecciones(SJO_I);liberar_intersecciones(_ER_I);liberar_intersecciones(CAR_I);liberar_intersecciones(GUA_I);liberar_intersecciones(LIM_I);liberar_intersecciones(PUN_I);liberar_intersecciones(PUN2_I);   
+}
+
+void liberar_pintada(BORDES_PINTADOS* bP){
+    if(bP != NULL){
+        free(bP->bordes_array);
+        free(bP);  
+    }
+}
+
+void liberar_intersecciones(INTERSECCION_PROV* iP){
+    if(iP != NULL){
+        free(iP->intersecciones);
+        free(iP);  
+    }
 }
 
 void dibujar_escena(){
-   rotar_mapa(90);
-   scanline(4,255,255,0);
-   scanline(5,255,0,0);
-   scanline(6,255,0,255);
-   scanline(0,0,0,255);
-   scanline(1,0,255,0);
-   scanline(2,0,255,255);
-   scanline(3,0,0,0);
-   scanline(7,255,0,255);
-    /*dibujar_patron(5);
-   dibujar_patron(4);
+    liberar_memoria();
+    COORD=fopen ("coordenadas.txt","r");
+    if ( COORD == NULL )
+    {
+        printf("No se puede abrir archivo") ;
+    }
+    crear_buffer();
+    printf("\nPANX = %d, PANY = %d, ESCALAX = %f, ESCALAY = %f, ANGULO = %d", panx_g, pany_g,escalx_g,escaly_g,angulo_g);
+    clasificar_provincias(panx_g,pany_g,escalx_g,escaly_g);
+    fclose(COORD);
+   rotar_mapa(angulo_g);
+   if(esPintado){
+    scanline(4,255,255,0);
+    scanline(5,255,0,0);
+    scanline(6,255,0,255);
+    scanline(0,0,0,255);
+    scanline(1,0,255,0);
+    scanline(2,0,255,255);
+    scanline(3,0,0,0);
+    scanline(7,255,0,255);
+   }else if(esTextura){
+    dibujar_patron(5);
+    dibujar_patron(4);
     dibujar_patron(6);
-   dibujar_patron(0);
-   dibujar_patron(1);
-   dibujar_patron(2);
-   dibujar_patron(3);
-   dibujar_patron(7);*/
-   //pintar_bordes_mapa();
-  //actualizar_buffer();
+    dibujar_patron(0);
+    dibujar_patron(1);
+    dibujar_patron(2);
+    dibujar_patron(3);
+    dibujar_patron(7);
+   }
+   if(esBorde){
+    pintar_bordes_mapa();
+   }
   int i , j;
   for (i = 0; i < H_SIZE; i++){
     for (j = 0; j < V_SIZE; j++){
@@ -87,6 +133,77 @@ void dibujar_escena(){
   }
   glFlush();
 }
+
+void teclado(unsigned char key, int x, int y){
+    if(key == 27){
+        exit(0);
+    }if(key == 'z'){
+        if(escalx_g < 1){
+            escalx_g+=0.1;
+            escaly_g+=0.1;
+        }else if(escalx_g <= 5){
+            escalx_g+=0.5;
+            escaly_g+=0.5;
+        } 
+    }if(key == 'x'){
+        if(escalx_g <= 1 && escalx_g >=0){
+            escalx_g-=0.1;
+            escaly_g-=0.1;
+        }else if(escalx_g > 1){
+            escalx_g-=0.5;
+            escaly_g-=0.5;
+        } 
+    }if(key == 'p'){
+        if(esTextura){
+            esTextura = 0;
+        }
+        esPintado = 1;
+    }if(key == 't'){
+        if(esPintado){
+            esPintado= 0;
+        }
+        esTextura = 1;
+    }if(key == 'b'){
+        if(esBorde){
+            esBorde = 0;
+        }else{
+            esBorde = 1;
+        }
+    }if(key == 'r'){
+        parametros_default();
+    }if(key == 'e'){
+        if(angulo_g-15 > -360){
+            angulo_g -= 15;
+        }else if(angulo_g == -360){
+            angulo_g = 0;
+        }
+    }if(key == 'q'){
+        if(angulo_g+15 < 360){
+            angulo_g += 15;
+        }else if(angulo_g == 360){
+            angulo_g = 0;
+        }
+    }if(key == 's'){
+        if(pany_g + 50 <= 500){
+            pany_g += 100;
+        }
+    }if(key == 'w'){
+        if(pany_g - 50 >= -500){
+            pany_g -= 100;
+        }
+    }if(key == 'd'){
+        if(panx_g - 50 >= -500){
+            panx_g -= 100;
+        }
+    }if(key == 'a'){
+        if(pany_g + 50 <= 500){
+            panx_g += 100;
+        }
+    }
+
+    glutPostRedisplay();
+}
+
 
 
 void rotar_mapa(double angle){
@@ -206,6 +323,7 @@ void insertar_activo(int max, int min, double pendiente, int x1, int y1, int id)
 
       //printf("\n ULTIMO ACTIVO CREADO: X1 = %d, Y1 = %d, X2 = %d, Y2 = %d", ultimo->contenido.x1, ultimo->contenido.y1, ultimo->contenido.x2, ultimo->contenido.y2);
    }
+   //free(nuevo);
 
 }
 
@@ -222,6 +340,7 @@ void eliminar_activo(int limite){
                //printf("\nSE BORRA EL PRIMERO");
                primero->siguiente->anterior = NULL;
                primero = primero->siguiente;
+               free(temp);
                bordes_activos--;
             }
             else if(temp == ultimo)
@@ -229,6 +348,7 @@ void eliminar_activo(int limite){
                //printf("\nSE BORRA EL ULTIMO");
                ultimo->anterior->siguiente = NULL;
                ultimo = ultimo->anterior;
+               free(temp);
                bordes_activos--;
             }
             else
@@ -236,6 +356,7 @@ void eliminar_activo(int limite){
                //printf("\nSE BORRA EL DEL MEDIO");
                temp->anterior->siguiente = temp->siguiente;
                temp->siguiente->anterior = temp->anterior;
+               free(temp);
                bordes_activos--;
 
             }
@@ -472,6 +593,7 @@ void calcular_intersecciones_scanline(){
                 }
                 index++;
              }
+             free(intersec);
              /*for(i = 0;i < index_depurada; i++){
                 printf("\n INTERSECCION DEPURADA. COORD X = %d , COORD Y = %d, MINIMO LOCAL  = %d, MAXIMO LOCAL  = %d", inter_depurada[i].ix, inter_depurada[i].iy, inter_depurada[i].bminy, inter_depurada[i].bmaxy);
              }*/
@@ -636,8 +758,13 @@ BORDES_PINTADOS* crear_provinvias_pintadas(){
 }
 
 void crear_buffer(){
-	int i, j;
-
+    int i, j;
+    if(buffer != NULL){
+        for (i = 0; i < H_SIZE; i++){
+            free(buffer[i]);
+        }
+         free(buffer);
+    }
   	buffer = (COLOR **)malloc(H_SIZE * sizeof(COLOR*));
   	for (i = 0; i < H_SIZE; i++){
     	buffer[i] = (COLOR *)malloc(V_SIZE * sizeof(COLOR));

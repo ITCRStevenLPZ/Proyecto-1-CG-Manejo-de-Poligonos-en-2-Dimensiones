@@ -74,6 +74,7 @@ typedef struct INTERSECCION_PROV
 
 }INTERSECCION_PROV;
 
+void teclado(unsigned char key, int x, int y);
 void dibujar_patron(int provincia);
 void plot_texture_line (int x0, int y0, int x1, int y1, int index); //Bresenham pero con RGB de las texturas
 void plot(int x, int y, int r, int g, int b);
@@ -93,3 +94,7 @@ void dibujar_escena();
 void actualizar_buffer();
 void rotar_mapa(double angulo);
 void calcular_intersecciones_scanline();
+void parametros_default();
+void liberar_pintada(BORDES_PINTADOS* bP);
+void liberar_memoria();
+void liberar_intersecciones(INTERSECCION_PROV* iP);
