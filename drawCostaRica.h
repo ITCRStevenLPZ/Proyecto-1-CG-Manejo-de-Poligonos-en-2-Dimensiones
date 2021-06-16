@@ -3,8 +3,12 @@
  * Escuela de Ingenieria en Computacion
  * Computer Graphics
  *
- * Programa: Mesa Example
- * Archivo:  mesa_example.h
+ * Primer proyecto de CG
+ * Ronald ESquivel Lopez
+ * Ricardo Murillo Jimenez
+ *
+ * Programa: Draw Costa Rica
+ * Archivo:  drawCostaRica.h
  */
 
 #include <GL/gl.h>

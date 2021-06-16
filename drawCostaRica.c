@@ -3,8 +3,12 @@
  * Escuela de Ingenieria en Computacion
  * Computer Graphics
  *
- * Programa: Mesa Example
- * Archivo:  mesa_example.c
+ * Primer proyecto de CG
+ * Ronald ESquivel Lopez
+ * Ricardo Murillo Jimenez
+ *
+ * Programa: Draw Costa Rica
+ * Archivo:  drawCostaRica.c
  */
 #include "drawCostaRica.h"
 #include "malloc.h"
@@ -42,7 +46,7 @@ int esPintado;
 int esTextura;
 int esBorde;
 
-int main(int argc, char** argv){
+int main(int argc, char** argv){ //main del programa
     parametros_default();
     //printf("\nAqui toy");
   	glutInit(&argc, argv);
@@ -56,7 +60,7 @@ int main(int argc, char** argv){
   	glutMainLoop();
   	return 1;
 }
-void parametros_default(){
+void parametros_default(){ //esta funcion es donde se establecen los parametros por defecto, importante para la funcion de resetear el mapa 
     panx_g = 0;
     pany_g = 0;
     escalx_g = 1;
@@ -67,27 +71,27 @@ void parametros_default(){
     esBorde = 1;
 }
 
-void liberar_memoria(){
+void liberar_memoria(){//funcion encargada de liberar memoria de algunas estructuras globales
     //liberar_pintada(ALA_P);liberar_pintada(SJO_P);liberar_pintada(_ER_P);liberar_pintada(CAR_P);liberar_pintada(GUA_P);liberar_pintada(LIM_P);liberar_pintada(PUN_P);liberar_pintada(PUN2_P);
     free(ALA);free(SJO);free(_ER);free(CAR);free(GUA);free(LIM);free(PUN);free(PUN2);
     liberar_intersecciones(ALA_I);liberar_intersecciones(SJO_I);liberar_intersecciones(_ER_I);liberar_intersecciones(CAR_I);liberar_intersecciones(GUA_I);liberar_intersecciones(LIM_I);liberar_intersecciones(PUN_I);liberar_intersecciones(PUN2_I);   
 }
 
-void liberar_pintada(BORDES_PINTADOS* bP){
+void liberar_pintada(BORDES_PINTADOS* bP){ //funcion encargada de liberar memoria de algunas estructuras globales
     if(bP != NULL){
         free(bP->bordes_array);
         free(bP);  
     }
 }
 
-void liberar_intersecciones(INTERSECCION_PROV* iP){
+void liberar_intersecciones(INTERSECCION_PROV* iP){ //funcion encargada de liberar memoria de algunas estructuras globales
     if(iP != NULL){
         free(iP->intersecciones);
         free(iP);  
     }
 }
 
-void dibujar_escena(){
+void dibujar_escena(){ //funcion principal del programa, en donde se produce el ciclo de dibujo
     liberar_memoria();
     COORD=fopen ("coordenadas.txt","r");
     if ( COORD == NULL )
@@ -95,7 +99,7 @@ void dibujar_escena(){
         printf("No se puede abrir archivo") ;
     }
     crear_buffer();
-    printf("\nPANX = %d, PANY = %d, ESCALAX = %f, ESCALAY = %f, ANGULO = %d", panx_g, pany_g,escalx_g,escaly_g,angulo_g);
+    //printf("\nPANX = %d, PANY = %d, ESCALAX = %f, ESCALAY = %f, ANGULO = %d", panx_g, pany_g,escalx_g,escaly_g,angulo_g);
     clasificar_provincias(panx_g,pany_g,escalx_g,escaly_g);
     fclose(COORD);
    rotar_mapa(angulo_g);
@@ -134,24 +138,22 @@ void dibujar_escena(){
   glFlush();
 }
 
-void teclado(unsigned char key, int x, int y){
+void teclado(unsigned char key, int x, int y){ //funcion encargada del input del teclado de GLUT
     if(key == 27){
+        printf("Has salido del programa, NO es un Segmentation Fault :)") ;
         exit(0);
     }if(key == 'z'){
         if(escalx_g < 1){
             escalx_g+=0.1;
             escaly_g+=0.1;
-        }else if(escalx_g <= 5){
-            escalx_g+=0.5;
-            escaly_g+=0.5;
+        }else if(escalx_g <= 4){
+            escalx_g+=0.25;
+            escaly_g+=0.25;
         } 
     }if(key == 'x'){
-        if(escalx_g <= 1 && escalx_g >=0){
-            escalx_g-=0.1;
-            escaly_g-=0.1;
-        }else if(escalx_g > 1){
-            escalx_g-=0.5;
-            escaly_g-=0.5;
+        if(escalx_g > 1){
+            escalx_g-=0.25;
+            escaly_g-=0.25;
         } 
     }if(key == 'p'){
         if(esTextura){
@@ -172,31 +174,31 @@ void teclado(unsigned char key, int x, int y){
     }if(key == 'r'){
         parametros_default();
     }if(key == 'e'){
-        if(angulo_g-15 > -360){
-            angulo_g -= 15;
+        if(angulo_g-30 > -360){
+            angulo_g -= 30;
         }else if(angulo_g == -360){
             angulo_g = 0;
         }
     }if(key == 'q'){
-        if(angulo_g+15 < 360){
-            angulo_g += 15;
+        if(angulo_g+30 < 360){
+            angulo_g += 30;
         }else if(angulo_g == 360){
             angulo_g = 0;
         }
     }if(key == 's'){
-        if(pany_g + 50 <= 500){
+        if(pany_g + 100 <= escaly_g * 500){
             pany_g += 100;
         }
     }if(key == 'w'){
-        if(pany_g - 50 >= -500){
+        if(pany_g - 100 >= escaly_g * -500){
             pany_g -= 100;
         }
     }if(key == 'd'){
-        if(panx_g - 50 >= -500){
+        if(panx_g - 100 >= escalx_g * -500){
             panx_g -= 100;
         }
     }if(key == 'a'){
-        if(pany_g + 50 <= 500){
+        if(pany_g + 100 <= escalx_g * 500){
             panx_g += 100;
         }
     }
@@ -206,7 +208,7 @@ void teclado(unsigned char key, int x, int y){
 
 
 
-void rotar_mapa(double angle){
+void rotar_mapa(double angle){ //funcion encargada de modificar las coordenadas dependiendo el angulo de entrada
    double angulo = 0;
    if(angle < 0 && angle >= -360){
       angulo = 360+angle;
@@ -219,8 +221,8 @@ void rotar_mapa(double angle){
    for(int i = 0; i<8;i++){
     //printf("\n\nNUEVA PROVINCIA");
       int iter = 0;
-      int y_min = 3000;
-      int y_max = -3000;
+      int y_min = 10000;
+      int y_max = -10000;
       while(provincias[i][iter].x1 != 0 && provincias[i][iter].y1 != 0 && provincias[i][iter].x2 != 0 && provincias[i][iter].y2 != 0){
          //printf("\n ORIGINAL Coord x1 = %d, Coord y1 = %d & Coord x2 = %d, Coord y2 = %d",provincias[i][iter].x1, provincias[i][iter].y1, provincias[i][iter].x2, provincias[i][iter].y2);
          int x1_shifted = provincias[i][iter].x1 - X_Origen;
@@ -278,7 +280,7 @@ void rotar_mapa(double angle){
 }
 
 
-int buscar_por_id(int id){
+int buscar_por_id(int id){ //funcion encargada de evitar que se ingresen dos o mas veces un borde en la lista de los bordes activos
    struct ACTIVO *temp;
    temp = primero;
 
@@ -294,7 +296,7 @@ int buscar_por_id(int id){
 
 }
 
-void insertar_activo(int max, int min, double pendiente, int x1, int y1, int id)
+void insertar_activo(int max, int min, double pendiente, int x1, int y1, int id) //funcion encargada de introducir bordes activos a la lista doblemente enlazada
 {
    struct ACTIVO *nuevo;
    nuevo = malloc(sizeof(struct ACTIVO));
@@ -327,7 +329,7 @@ void insertar_activo(int max, int min, double pendiente, int x1, int y1, int id)
 
 }
 
-void eliminar_activo(int limite){
+void eliminar_activo(int limite){//encargado de eliminar de la lista enlazada doble bordes cuyo Y minimo ya fue alcanzado y ya no deben permanecer activos
    struct ACTIVO *temp;
    temp = primero;
 
@@ -366,10 +368,10 @@ void eliminar_activo(int limite){
 
 }
 
-int minimo_activo(){
+int minimo_activo(){ //funcion encargada de retornar en maximo de los minimos Y de una lista de bordes activos
    struct ACTIVO *temp;
    temp = primero;
-   int resp = -3000;
+   int resp = -10000;
     while(temp != NULL)
     {
       if(temp->min_y > resp){
@@ -381,7 +383,7 @@ int minimo_activo(){
     return resp;
 
 }
-void activarBordes(int tamano,BORDES *bordes_array, int max_y){
+void activarBordes(int tamano,BORDES *bordes_array, int max_y){ //funcion encargada de introducir bordes a struct ACTIVO, muy importante para los calculos de intersecciones y por ende scanline
       int i;
       for(i = 0; i < tamano; i++){ //CICLO PARA ACTIVAR BORDES
       //printf("\nBuscando = %d", i);
@@ -405,7 +407,7 @@ void activarBordes(int tamano,BORDES *bordes_array, int max_y){
     }
     //printf("\nBORDES ACTIVOS ITERADOS= %d", bordes_activos);
 }
-void dibujar_patron(int provincia){
+void dibujar_patron(int provincia){ //muy similar al scanline de rellenado de poligonos, solo que en vez de rellenar con un color solido, rellena con una textura
     BORDES_PINTADOS *provincias[8] = {ALA_P,SJO_P,_ER_P,CAR_P,GUA_P,LIM_P,PUN_P,PUN2_P};
     INTERSECCION_PROV *intersecciones_provincias[8] = {ALA_I,SJO_I,_ER_I,CAR_I,GUA_I,LIM_I,PUN_I,PUN2_I};
     int max_y = provincias[provincia]->yMAX;
@@ -475,7 +477,7 @@ void plot_texture_line (int x0, int y0, int x1, int y1, int provincia) //Bresenh
     }
 }
 
-void scanline(int provincia, int r, int g, int b){
+void scanline(int provincia, int r, int g, int b){ //funcion encargada del fill de scanline, mediante el uso de los structs de INTERSECCION_PROV, que ya estan ordenados tanto en Y como en X, por medio de la paridad inpar se comienzan a rellenar los poligonos.
         BORDES_PINTADOS *provincias[8] = {ALA_P,SJO_P,_ER_P,CAR_P,GUA_P,LIM_P,PUN_P,PUN2_P};
         INTERSECCION_PROV *intersecciones_provincias[8] = {ALA_I,SJO_I,_ER_I,CAR_I,GUA_I,LIM_I,PUN_I,PUN2_I};
         int max_y = provincias[provincia]->yMAX;
@@ -501,7 +503,7 @@ void scanline(int provincia, int r, int g, int b){
         }
 }
 
-void calcular_intersecciones_scanline(){
+void calcular_intersecciones_scanline(){ //la funcion mas compleja de todo el programa, encargada de calcular las intersecciones de scanlines con todas las provincias y almacenandolas en estructuras de tipo INTERSECCION_PROV
     int indice;
     BORDES_PINTADOS *provincias[8] = {ALA_P,SJO_P,_ER_P,CAR_P,GUA_P,LIM_P,PUN_P,PUN2_P};
     INTERSECCION_PROV *intersecciones_provincias[8] = {ALA_I,SJO_I,_ER_I,CAR_I,GUA_I,LIM_I,PUN_I,PUN2_I};
@@ -621,7 +623,7 @@ void calcular_intersecciones_scanline(){
     ALA_I = intersecciones_provincias[0];SJO_I = intersecciones_provincias[1];_ER_I = intersecciones_provincias[2];CAR_I = intersecciones_provincias[3];GUA_I = intersecciones_provincias[4];LIM_I = intersecciones_provincias[5];PUN_I = intersecciones_provincias[6];PUN2_I= intersecciones_provincias[7];
 }
 
-void clasificar_provincias(int panx,int pany, float escalx, float escaly){
+void clasificar_provincias(int panx,int pany, float escalx, float escaly){ //primera funcion que obtiene las coordenadas crudas del coordenadas.txt, en donde las almacenas en forma de BORDES y BORDES_PINTADOS, ademas, dependiendo de la escala y el pan, asi modifica estas coordenadas
 	rewind(COORD);
    BORDES* nuevo_aux;
 	BORDES* nuevo;
@@ -631,8 +633,8 @@ void clasificar_provincias(int panx,int pany, float escalx, float escaly){
 	int iter = 0;
   int tamano_real = 0;
 	int i = 0;
-  int y_max = -3000;
-  int y_min = 3000;
+  int y_max = -10000;
+  int y_min = 10000;
   int x,y,x2,y2;
   fscanf(COORD, "%d,%d", &x, &y);
   x = (int)(x+panx)*escalx; y = (int)(y + pany)*escaly;
@@ -678,8 +680,8 @@ void clasificar_provincias(int panx,int pany, float escalx, float escaly){
         provincias[iter] = nuevo;
         nuevo_pintado->cant = tamano_real;nuevo_pintado->yMAX = y_max;nuevo_pintado->yMIN = y_min;
         //printf("\nTamano = %d, yMAX = %d, yMIN = %d", nuevo_pintado->cant,nuevo_pintado->yMAX,nuevo_pintado->yMIN);
-        y_max = -3000;
-        y_min = 3000;
+        y_max = -10000;
+        y_min = 10000;
         tamano_real = 0;
         nuevo_pintado = ordenar_Y(nuevo_aux,nuevo_pintado);
         provincias_pintadas[iter] = nuevo_pintado;
@@ -697,7 +699,7 @@ void clasificar_provincias(int panx,int pany, float escalx, float escaly){
 
 
 
-BORDES_PINTADOS* ordenar_Y(BORDES *bordes, BORDES_PINTADOS *bP){
+BORDES_PINTADOS* ordenar_Y(BORDES *bordes, BORDES_PINTADOS *bP){ //funcion encargada de ordenar la lista de bordes dentro de la estructura BORDES_PINTADOS, esta funcion es vital para el calculo de intersecciones y por ende scanline
    BORDES *b = bordes;
   //printf("\n NUEVA PROVINCIA");
   int tamano = bP->cant;
@@ -722,7 +724,7 @@ BORDES_PINTADOS* ordenar_Y(BORDES *bordes, BORDES_PINTADOS *bP){
 
 }
 
-BORDES* crear_provinvias(){
+BORDES* crear_provinvias(){ //Encargada de crear la estructura BORDES, la cual es la estructura basica del programa y que basicamente todo el programa se basa y se apoya en ella. Contiene dos pares de coordenadas
 	//printf("\nCreo una provincia");
     BORDES *b;
   	b = (BORDES *)malloc(PROV_MAX_COORDS * sizeof(BORDES));
@@ -734,7 +736,7 @@ BORDES* crear_provinvias(){
     return b;
 }
 
-BORDES_PINTADOS* crear_provinvias_pintadas(){
+BORDES_PINTADOS* crear_provinvias_pintadas(){ //funcion encargada de inicializar estructuras de tipo BORDES_PINTADOS, que contienen datos de cada provincia vitales para otras funciones
 	//printf("\nCreo una provincia");
 	  BORDES* nuevo = (BORDES *)malloc(PROV_MAX_COORDS * sizeof(BORDES));
     BORDES_PINTADOS* b;
@@ -757,7 +759,7 @@ BORDES_PINTADOS* crear_provinvias_pintadas(){
     return b;
 }
 
-void crear_buffer(){
+void crear_buffer(){ //funcion encargada de liberar memoria y de crear el framebuffer (en ese orden)
     int i, j;
     if(buffer != NULL){
         for (i = 0; i < H_SIZE; i++){
@@ -779,7 +781,7 @@ void crear_buffer(){
 }
 
 
-void plot(int x, int y, int r, int g, int b){
+void plot(int x, int y, int r, int g, int b){ //funcion encargada de colocar en x y coordenadas valores de RGB dentro del framebuffer
 
 	//printf("Resultado = %d , %d\n", x, y);
     if(x >= 0 && x < V_SIZE && y >= 0 && y < H_SIZE){
@@ -789,7 +791,7 @@ void plot(int x, int y, int r, int g, int b){
     }
 }
 
-void plot_line (int x0, int y0, int x1, int y1, int r, int g, int b) //Bresenham
+void plot_line (int x0, int y0, int x1, int y1, int r, int g, int b) //Bresenham muy utilizado en el fill de scanline
 {
    //printf("\n PINTA Coord x = %d, Coord y = %d & Coord x = %d, Coord y = %d",x0, y0, x1, y1);
   	int dx =  abs (x1 - x0), sx = x0 < x1 ? 1 : -1;
@@ -806,7 +808,7 @@ void plot_line (int x0, int y0, int x1, int y1, int r, int g, int b) //Bresenham
   	}
 }
 
-void pintar_puntos_mapa(){
+void pintar_puntos_mapa(){ //funcion encargada se pintar puntos en el framebuffer
 	rewind(COORD);
 	int x,y;
 	int n = 18;
@@ -824,7 +826,7 @@ void pintar_puntos_mapa(){
     
 }
 
-void pintar_bordes_mapa(){
+void pintar_bordes_mapa(){ //funcion encargada de dibujar solo los bordes de cada una de lasa provincias
   BORDES *provincias[8] = {ALA,SJO,_ER,CAR,GUA,LIM,PUN,PUN2};
   for(int i = 0; i<8;i++){
     int iter = 0;
